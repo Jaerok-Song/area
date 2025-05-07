@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>사각형 넓이 구하기</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    #container {
+      position: relative;
+      display: inline-block;
+      margin-top: 30px;
+    }
+    #rectangle {
+      background-color: #a2d5f2;
+      border: 2px solid #333;
+    }
+    .label {
+      position: absolute;
+      font-weight: bold;
+      background-color: white;
+      padding: 2px 5px;
+      border: 1px solid #999;
+      font-size: 14px;
+    }
+    #widthLabel {
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    #heightLabel {
+      left: -55px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  </style>
+</head>
+<body>
+
+  <h2>[문제] 다음 사각형의 넓이를 구하시오.</h2>
+
+  <div id="container">
+    <div id="widthLabel" class="label"></div>
+    <div id="heightLabel" class="label"></div>
+    <div id="rectangle"></div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <label for="userAnswer">넓이 (cm²): </label>
+    <input type="number" id="userAnswer">
+    <button onclick="checkAnswer()">정답 확인</button>
+  </div>
+
+  <div id="result" style="margin-top: 10px; font-weight: bold;"></div>
+
+  <script>
+    let widthCm, heightCm;
+
+    function generateProblem() {
+      widthCm = Math.floor(Math.random() * 11) + 5;  // 5~15cm
+      heightCm = Math.floor(Math.random() * 11) + 5;
+
+      const pixelPerCm = 20;
+      const rect = document.getElementById("rectangle");
+      rect.style.width = widthCm * pixelPerCm + "px";
+      rect.style.height = heightCm * pixelPerCm + "px";
+
+      document.getElementById("widthLabel").innerText = widthCm + "cm";
+      document.getElementById("heightLabel").innerText = heightCm + "cm";
+    }
+
+    function checkAnswer() {
+      const user = parseInt(document.getElementById("userAnswer").value);
+      const correct = widthCm * heightCm;
+      const resultDiv = document.getElementById("result");
+
+      if (user === correct) {
+        resultDiv.innerText = "정답입니다! ✅";
+        resultDiv.style.color = "green";
+      } else {
+        resultDiv.innerText = `틀렸습니다. 정답은 ${correct}cm² 입니다.`;
+        resultDiv.style.color = "red";
+      }
+    }
+
+    window.onload = generateProblem;
+  </script>
+
+</body>
+</html>
