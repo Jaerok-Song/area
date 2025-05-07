@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>사각형 넓이 구하기</title>
+  <title>사각형 넓이 구하기 - 5문제</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -36,11 +36,16 @@
       top: 50%;
       transform: translateY(-50%);
     }
+    #result {
+      font-weight: bold;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
   <h2>[문제] 다음 사각형의 넓이를 구하시오.</h2>
+  <div id="progress">문제 1 / 5</div>
 
   <div id="container">
     <div id="widthLabel" class="label"></div>
@@ -54,40 +59,74 @@
     <button onclick="checkAnswer()">정답 확인</button>
   </div>
 
-  <div id="result" style="margin-top: 10px; font-weight: bold;"></div>
+  <div id="result"></div>
+  <div id="summary" style="margin-top: 30px; font-weight: bold;"></div>
 
   <script>
-    let widthCm, heightCm;
+    const problems = [];
+    const pixelPerCm = 20;
+    let current = 0;
+    let score = 0;
 
-    function generateProblem() {
-      widthCm = Math.floor(Math.random() * 11) + 5;  // 5~15cm
-      heightCm = Math.floor(Math.random() * 11) + 5;
+    function generateProblems() {
+      for (let i = 0; i < 5; i++) {
+        const w = Math.floor(Math.random() * 11) + 5;  // 5~15cm
+        const h = Math.floor(Math.random() * 11) + 5;
+        problems.push({ width: w, height: h });
+      }
+    }
 
-      const pixelPerCm = 20;
+    function showProblem(index) {
+      const prob = problems[index];
       const rect = document.getElementById("rectangle");
-      rect.style.width = widthCm * pixelPerCm + "px";
-      rect.style.height = heightCm * pixelPerCm + "px";
 
-      document.getElementById("widthLabel").innerText = widthCm + "cm";
-      document.getElementById("heightLabel").innerText = heightCm + "cm";
+      rect.style.width = prob.width * pixelPerCm + "px";
+      rect.style.height = prob.height * pixelPerCm + "px";
+
+      document.getElementById("widthLabel").innerText = prob.width + "cm";
+      document.getElementById("heightLabel").innerText = prob.height + "cm";
+      document.getElementById("progress").innerText = `문제 ${index + 1} / 5`;
+      document.getElementById("userAnswer").value = '';
+      document.getElementById("result").innerText = '';
     }
 
     function checkAnswer() {
       const user = parseInt(document.getElementById("userAnswer").value);
-      const correct = widthCm * heightCm;
+      const prob = problems[current];
+      const correct = prob.width * prob.height;
       const resultDiv = document.getElementById("result");
 
       if (user === correct) {
         resultDiv.innerText = "정답입니다! ✅";
         resultDiv.style.color = "green";
+        score++;
       } else {
         resultDiv.innerText = `틀렸습니다. 정답은 ${correct}cm² 입니다.`;
         resultDiv.style.color = "red";
       }
+
+      current++;
+      if (current < problems.length) {
+        setTimeout(() => showProblem(current), 1500);
+      } else {
+        setTimeout(showSummary, 1500);
+      }
     }
 
-    window.onload = generateProblem;
-  </script>
+    function showSummary() {
+      document.getElementById("container").style.display = "none";
+      document.getElementById("userAnswer").style.display = "none";
+      document.querySelector("button").style.display = "none";
+      document.getElementById("progress").style.display = "none";
+      document.getElementById("result").style.display = "none";
 
+      document.getElementById("summary").innerText = `총 ${problems.length}문제 중 ${score}문제를 맞췄습니다!`;
+    }
+
+    window.onload = () => {
+      generateProblems();
+      showProblem(0);
+    };
+  </script>
 </body>
 </html>
