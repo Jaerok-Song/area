@@ -4,9 +4,13 @@
   <meta charset="UTF-8">
   <title>사각형 넓이 구하기 - 2단 레이아웃</title>
   <style>
+    @page {
+      margin: 1cm;
+    }
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 1cm;
     }
     .header {
       text-align: center;
@@ -27,6 +31,13 @@
       margin-bottom: 40px;
       border: 1px solid #ccc;
       padding: 10px;
+    }
+    .problem-title {
+      margin-bottom: 10px;
+    }
+    .problem-title span {
+      display: inline-block;
+      width: 1cm;
     }
     .rectangle-container {
       position: relative;
@@ -117,7 +128,7 @@
       problemDiv.className = "problem-column";
       problemDiv.innerHTML = `
         <div class="problem">
-          <div><strong>[문제${i + 1}]</strong></div>
+          <div class="problem-title"><strong><span>[문제${i + 1}]</span></strong>&nbsp;&nbsp;다음 사각형의 넓이를 구하시오.</div>
           <div class="rectangle-container">
             <div class="label widthLabel">${p.width}cm</div>
             <div class="label heightLabel">${p.height}cm</div>
