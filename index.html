@@ -2,19 +2,22 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>사각형 넓이 구하기 - 5문제</title>
+  <title>사각형 넓이 구하기 (5문제)</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 40px;
+      padding: 20px;
     }
-    #container {
+    .problem {
+      margin-bottom: 40px;
+    }
+    .rectangle-container {
       position: relative;
       display: inline-block;
-      margin-top: 30px;
+      margin: 10px 0;
     }
-    #rectangle {
+    .rectangle {
       background-color: #a2d5f2;
       border: 2px solid #333;
     }
@@ -26,107 +29,99 @@
       border: 1px solid #999;
       font-size: 14px;
     }
-    #widthLabel {
+    .widthLabel {
       top: -25px;
       left: 50%;
       transform: translateX(-50%);
     }
-    #heightLabel {
+    .heightLabel {
       left: -55px;
       top: 50%;
       transform: translateY(-50%);
     }
-    #result {
+    .result {
+      margin-top: 5px;
       font-weight: bold;
-      margin-top: 10px;
+    }
+    #controls {
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
 
   <h2>[문제] 다음 사각형의 넓이를 구하시오.</h2>
-  <div id="progress">문제 1 / 5</div>
 
-  <div id="container">
-    <div id="widthLabel" class="label"></div>
-    <div id="heightLabel" class="label"></div>
-    <div id="rectangle"></div>
+  <div id="problems"></div>
+
+  <div id="controls">
+    <button onclick="gradeAnswers()">채점하기</button>
+    <button onclick="generateProblems()">다시 풀기</button>
+    <button onclick="endQuiz()">종료하기</button>
   </div>
 
-  <div style="margin-top: 20px;">
-    <label for="userAnswer">넓이 (cm²): </label>
-    <input type="number" id="userAnswer">
-    <button onclick="checkAnswer()">정답 확인</button>
-  </div>
-
-  <div id="result"></div>
-  <div id="summary" style="margin-top: 30px; font-weight: bold;"></div>
+  <div id="endMessage" style="margin-top: 20px; font-weight: bold;"></div>
 
   <script>
-    const problems = [];
-    const pixelPerCm = 20;
-    let current = 0;
-    let score = 0;
+    const numProblems = 5;
+    const pixelPerCm = 15;
+    let problems = [];
 
     function generateProblems() {
-      for (let i = 0; i < 5; i++) {
-        const w = Math.floor(Math.random() * 11) + 5;  // 5~15cm
-        const h = Math.floor(Math.random() * 11) + 5;
-        problems.push({ width: w, height: h });
+      problems = [];
+      const container = document.getElementById("problems");
+      container.innerHTML = '';
+      document.getElementById("endMessage").innerText = '';
+
+      for (let i = 0; i < numProblems; i++) {
+        const width = Math.floor(Math.random() * 11) + 5; // 5~15cm
+        const height = Math.floor(Math.random() * 11) + 5;
+        problems.push({ width, height });
+
+        const problemDiv = document.createElement("div");
+        problemDiv.className = "problem";
+        problemDiv.innerHTML = `
+          <div>문제 ${i + 1}</div>
+          <div class="rectangle-container">
+            <div class="label widthLabel">${width}cm</div>
+            <div class="label heightLabel">${height}cm</div>
+            <div class="rectangle" style="width: ${width * pixelPerCm}px; height: ${height * pixelPerCm}px;"></div>
+          </div>
+          <div>
+            <label>넓이: </label>
+            <input type="number" id="answer${i}">
+            <span class="result" id="result${i}"></span>
+          </div>
+        `;
+        container.appendChild(problemDiv);
       }
     }
 
-    function showProblem(index) {
-      const prob = problems[index];
-      const rect = document.getElementById("rectangle");
+    function gradeAnswers() {
+      let score = 0;
+      for (let i = 0; i < numProblems; i++) {
+        const userInput = parseInt(document.getElementById(`answer${i}`).value);
+        const correct = problems[i].width * problems[i].height;
+        const resultSpan = document.getElementById(`result${i}`);
 
-      rect.style.width = prob.width * pixelPerCm + "px";
-      rect.style.height = prob.height * pixelPerCm + "px";
-
-      document.getElementById("widthLabel").innerText = prob.width + "cm";
-      document.getElementById("heightLabel").innerText = prob.height + "cm";
-      document.getElementById("progress").innerText = `문제 ${index + 1} / 5`;
-      document.getElementById("userAnswer").value = '';
-      document.getElementById("result").innerText = '';
-    }
-
-    function checkAnswer() {
-      const user = parseInt(document.getElementById("userAnswer").value);
-      const prob = problems[current];
-      const correct = prob.width * prob.height;
-      const resultDiv = document.getElementById("result");
-
-      if (user === correct) {
-        resultDiv.innerText = "정답입니다! ✅";
-        resultDiv.style.color = "green";
-        score++;
-      } else {
-        resultDiv.innerText = `틀렸습니다. 정답은 ${correct}cm² 입니다.`;
-        resultDiv.style.color = "red";
+        if (userInput === correct) {
+          resultSpan.innerText = "✅ 정답";
+          resultSpan.style.color = "green";
+          score++;
+        } else {
+          resultSpan.innerText = `❌ 오답 (정답: ${correct})`;
+          resultSpan.style.color = "red";
+        }
       }
-
-      current++;
-      if (current < problems.length) {
-        setTimeout(() => showProblem(current), 1500);
-      } else {
-        setTimeout(showSummary, 1500);
-      }
+      document.getElementById("endMessage").innerText = `총 ${numProblems}문제 중 ${score}문제를 맞췄습니다!`;
     }
 
-    function showSummary() {
-      document.getElementById("container").style.display = "none";
-      document.getElementById("userAnswer").style.display = "none";
-      document.querySelector("button").style.display = "none";
-      document.getElementById("progress").style.display = "none";
-      document.getElementById("result").style.display = "none";
-
-      document.getElementById("summary").innerText = `총 ${problems.length}문제 중 ${score}문제를 맞췄습니다!`;
+    function endQuiz() {
+      document.getElementById("problems").innerHTML = '';
+      document.getElementById("endMessage").innerText = "문제를 종료했습니다. 수고하셨습니다!";
     }
 
-    window.onload = () => {
-      generateProblems();
-      showProblem(0);
-    };
+    window.onload = generateProblems;
   </script>
 </body>
 </html>
