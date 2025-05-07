@@ -2,97 +2,108 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>문제지 레이아웃</title>
+  <title>사각형 넓이 구하기 - 2단 레이아웃</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
       margin: 20px;
-    }
-    .problem-column {
-      width: 48%;
-      padding: 10px;
-    }
-    .problem {
-      margin-bottom: 15px;
-      padding: 10px;
-      border: 1px solid #333;
-      border-radius: 5px;
-    }
-    .problem-number {
-      font-weight: bold;
-    }
-    .problem-content {
-      margin-top: 5px;
     }
     .header {
       text-align: center;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .problem-column {
+      width: 48%;
+    }
+    .problem {
+      margin-bottom: 40px;
+    }
+    .rectangle-container {
+      position: relative;
+      display: inline-block;
+      margin: 10px 0;
+    }
+    .rectangle {
+      background-color: #a2d5f2;
+      border: 2px solid #333;
+    }
+    .label {
+      position: absolute;
+      font-weight: bold;
+      background-color: white;
+      padding: 2px 5px;
+      border: 1px solid #999;
+      font-size: 14px;
+    }
+    .widthLabel {
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .heightLabel {
+      left: -55px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .result {
+      margin-top: 5px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h2>문제지</h2>
-  </div>
+<div class="header">[문제] 다음 사각형의 넓이를 구하시오.</div>
 
-  <div class="container">
-    <div class="problem-column">
-      <div class="problem">
-        <div class="problem-number">[문제1]</div>
-        <div class="problem-content">사각형의 넓이를 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제2]</div>
-        <div class="problem-content">원의 넓이를 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제3]</div>
-        <div class="problem-content">삼각형의 넓이를 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제4]</div>
-        <div class="problem-content">다각형의 넓이를 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제5]</div>
-        <div class="problem-content">직사각형의 면적을 구하시오.</div>
-      </div>
-    </div>
+<div class="container" id="problems"></div>
 
-    <div class="problem-column">
-      <div class="problem">
-        <div class="problem-number">[문제6]</div>
-        <div class="problem-content">삼각형의 면적을 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제7]</div>
-        <div class="problem-content">원기둥의 부피를 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제8]</div>
-        <div class="problem-content">구의 부피를 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제9]</div>
-        <div class="problem-content">직육면체의 부피를 구하시오.</div>
-      </div>
-      <div class="problem">
-        <div class="problem-number">[문제10]</div>
-        <div class="problem-content">입체도형의 부피를 구하시오.</div>
-      </div>
-    </div>
-  </div>
+<script>
+  const pixelPerCm = 4;
+
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function generateProblems() {
+    const problemsContainer = document.getElementById("problems");
+    problemsContainer.innerHTML = '';
+
+    for (let i = 0; i < 10; i++) {
+      const width = getRandomInt(5, 15);
+      const height = getRandomInt(5, 15);
+
+      const columnDiv = document.createElement("div");
+      columnDiv.className = "problem-column";
+
+      const problemDiv = document.createElement("div");
+      problemDiv.className = "problem";
+      problemDiv.innerHTML = `
+        <div>[문제${i + 1}]</div>
+        <div class="rectangle-container">
+          <div class="label widthLabel">${width}cm</div>
+          <div class="label heightLabel">${height}cm</div>
+          <div class="rectangle" style="width: ${width * pixelPerCm}px; height: ${height * pixelPerCm}px;"></div>
+        </div>
+        <div>
+          <label>넓이: </label>
+          <input type="number" id="answer${i}">
+        </div>
+      `;
+
+      columnDiv.appendChild(problemDiv);
+      problemsContainer.appendChild(columnDiv);
+    }
+  }
+
+  window.onload = generateProblems;
+</script>
 
 </body>
 </html>
