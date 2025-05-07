@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>사각형 넓이 구하기 (5문제)</title>
+  <title>사각형 넓이 구하기</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -52,40 +52,75 @@
 
   <h2>[문제] 다음 사각형의 넓이를 구하시오.</h2>
 
+  <div>
+    난이도 선택:
+    <select id="difficulty">
+      <option value="easy">초급 (5~10cm)</option>
+      <option value="medium">중급 (10~20cm)</option>
+      <option value="hard">고급 (15~30cm)</option>
+    </select>
+    <button onclick="generateProblems()">문제 시작</button>
+  </div>
+
   <div id="problems"></div>
 
   <div id="controls">
     <button onclick="gradeAnswers()">채점하기</button>
-    <button onclick="generateProblems()">다시 풀기</button>
-    <button onclick="endQuiz()">종료하기</button>
+    <button onclick="retryIncorrect()">오답 다시 풀기</button>
   </div>
 
   <div id="endMessage" style="margin-top: 20px; font-weight: bold;"></div>
 
   <script>
     const numProblems = 5;
-    const pixelPerCm = 15;
+    const pixelPerCm = 10;
     let problems = [];
+    let incorrectIndexes = [];
 
-    function generateProblems() {
-      problems = [];
+    function getRangeByDifficulty() {
+      const diff = document.getElementById("difficulty").value;
+      if (diff === "easy") return [5, 10];
+      if (diff === "medium") return [10, 20];
+      return [15, 30]; // hard
+    }
+
+    function generateProblems(onlyIncorrect = false) {
+      const [minCm, maxCm] = getRangeByDifficulty();
+      const container = document.getElementById("problems");
+      document.getElementById("endMessage").innerText = "";
+
+      if (!onlyIncorrect) {
+        problems = [];
+        container.innerHTML = '';
+        for (let i = 0; i < numProblems; i++) {
+          const width = getRandomInt(minCm, maxCm);
+          const height = getRandomInt(minCm, maxCm);
+          problems.push({ width, height, index: i });
+        }
+      } else {
+        incorrectIndexes.forEach(i => {
+          const width = getRandomInt(minCm, maxCm);
+          const height = getRandomInt(minCm, maxCm);
+          problems[i] = { width, height, index: i };
+        });
+      }
+
+      renderProblems();
+    }
+
+    function renderProblems() {
       const container = document.getElementById("problems");
       container.innerHTML = '';
-      document.getElementById("endMessage").innerText = '';
 
-      for (let i = 0; i < numProblems; i++) {
-        const width = Math.floor(Math.random() * 11) + 5; // 5~15cm
-        const height = Math.floor(Math.random() * 11) + 5;
-        problems.push({ width, height });
-
+      problems.forEach((p, i) => {
         const problemDiv = document.createElement("div");
         problemDiv.className = "problem";
         problemDiv.innerHTML = `
           <div>문제 ${i + 1}</div>
           <div class="rectangle-container">
-            <div class="label widthLabel">${width}cm</div>
-            <div class="label heightLabel">${height}cm</div>
-            <div class="rectangle" style="width: ${width * pixelPerCm}px; height: ${height * pixelPerCm}px;"></div>
+            <div class="label widthLabel">${p.width}cm</div>
+            <div class="label heightLabel">${p.height}cm</div>
+            <div class="rectangle" style="width: ${p.width * pixelPerCm}px; height: ${p.height * pixelPerCm}px;"></div>
           </div>
           <div>
             <label>넓이: </label>
@@ -94,12 +129,14 @@
           </div>
         `;
         container.appendChild(problemDiv);
-      }
+      });
     }
 
     function gradeAnswers() {
       let score = 0;
-      for (let i = 0; i < numProblems; i++) {
+      incorrectIndexes = [];
+
+      for (let i = 0; i < problems.length; i++) {
         const userInput = parseInt(document.getElementById(`answer${i}`).value);
         const correct = problems[i].width * problems[i].height;
         const resultSpan = document.getElementById(`result${i}`);
@@ -111,17 +148,33 @@
         } else {
           resultSpan.innerText = `❌ 오답 (정답: ${correct})`;
           resultSpan.style.color = "red";
+          incorrectIndexes.push(i);
         }
       }
-      document.getElementById("endMessage").innerText = `총 ${numProblems}문제 중 ${score}문제를 맞췄습니다!`;
+
+      const total = problems.length;
+      const msg = incorrectIndexes.length === 0
+        ? `축하합니다! ${total}문제 모두 정답입니다!`
+        : `총 ${total}문제 중 ${total - incorrectIndexes.length}문제 정답, ${incorrectIndexes.length}문제 오답`;
+      document.getElementById("endMessage").innerText = msg;
     }
 
-    function endQuiz() {
-      document.getElementById("problems").innerHTML = '';
-      document.getElementById("endMessage").innerText = "문제를 종료했습니다. 수고하셨습니다!";
+    function retryIncorrect() {
+      if (incorrectIndexes.length === 0) {
+        alert("오답이 없습니다. 먼저 채점을 해주세요.");
+        return;
+      }
+      generateProblems(true);
     }
 
-    window.onload = generateProblems;
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 초기화
+    window.onload = () => {
+      document.getElementById("problems").innerHTML = "<p>난이도를 선택한 후 문제를 시작하세요.</p>";
+    };
   </script>
 </body>
 </html>
