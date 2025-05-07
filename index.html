@@ -25,6 +25,8 @@
     }
     .problem {
       margin-bottom: 40px;
+      border: 1px solid #ccc;
+      padding: 10px;
     }
     .rectangle-container {
       position: relative;
@@ -57,50 +59,114 @@
       margin-top: 5px;
       font-weight: bold;
     }
+    #controls {
+      text-align: center;
+      margin-top: 30px;
+    }
+    #endMessage {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
 <div class="header">[문제] 다음 사각형의 넓이를 구하시오.</div>
 
-<div class="container">
+<div class="container"></div>
+
+<div id="controls">
+  <button onclick="gradeAnswers()">채점하기</button>
+  <button onclick="retryIncorrect()">오답 다시 풀기</button>
 </div>
+
+<div id="endMessage"></div>
 
 <script>
   const pixelPerCm = 4;
+  let problems = [];
+  let incorrectIndexes = [];
 
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  function generateProblems() {
+  function generateProblems(onlyIncorrect = false) {
     const container = document.querySelector(".container");
     container.innerHTML = "";
+    document.getElementById("endMessage").innerText = "";
 
-    for (let i = 0; i < 10; i++) {
-      const width = getRandomInt(5, 15);
-      const height = getRandomInt(5, 15);
+    if (!onlyIncorrect) {
+      problems = [];
+      for (let i = 0; i < 10; i++) {
+        const width = getRandomInt(5, 15);
+        const height = getRandomInt(5, 15);
+        problems.push({ width, height, index: i });
+      }
+    } else {
+      incorrectIndexes.forEach(i => {
+        const width = getRandomInt(5, 15);
+        const height = getRandomInt(5, 15);
+        problems[i] = { width, height, index: i };
+      });
+    }
 
+    problems.forEach((p, i) => {
       const problemDiv = document.createElement("div");
       problemDiv.className = "problem-column";
-
       problemDiv.innerHTML = `
         <div class="problem">
-          <div>[문제${i + 1}]</div>
+          <div><strong>[문제${i + 1}]</strong></div>
           <div class="rectangle-container">
-            <div class="label widthLabel">${width}cm</div>
-            <div class="label heightLabel">${height}cm</div>
-            <div class="rectangle" style="width: ${width * pixelPerCm}px; height: ${height * pixelPerCm}px;"></div>
+            <div class="label widthLabel">${p.width}cm</div>
+            <div class="label heightLabel">${p.height}cm</div>
+            <div class="rectangle" style="width: ${p.width * pixelPerCm}px; height: ${p.height * pixelPerCm}px;"></div>
           </div>
           <div>
             <label>넓이: </label>
             <input type="number" id="answer${i}">
+            <span class="result" id="result${i}"></span>
           </div>
         </div>
       `;
-
       container.appendChild(problemDiv);
+    });
+  }
+
+  function gradeAnswers() {
+    let score = 0;
+    incorrectIndexes = [];
+
+    for (let i = 0; i < problems.length; i++) {
+      const userInput = parseInt(document.getElementById(`answer${i}`).value);
+      const correct = problems[i].width * problems[i].height;
+      const resultSpan = document.getElementById(`result${i}`);
+
+      if (userInput === correct) {
+        resultSpan.innerText = "✅ 정답";
+        resultSpan.style.color = "green";
+        score++;
+      } else {
+        resultSpan.innerText = `❌ 오답 (정답: ${correct})`;
+        resultSpan.style.color = "red";
+        incorrectIndexes.push(i);
+      }
     }
+
+    const total = problems.length;
+    const msg = incorrectIndexes.length === 0
+      ? `축하합니다! ${total}문제 모두 정답입니다!`
+      : `총 ${total}문제 중 ${total - incorrectIndexes.length}문제 정답, ${incorrectIndexes.length}문제 오답`;
+    document.getElementById("endMessage").innerText = msg;
+  }
+
+  function retryIncorrect() {
+    if (incorrectIndexes.length === 0) {
+      alert("오답이 없습니다. 먼저 채점을 해주세요.");
+      return;
+    }
+    generateProblems(true);
   }
 
   window.onload = generateProblems;
