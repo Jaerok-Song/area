@@ -9,8 +9,15 @@
       text-align: center;
       padding: 20px;
     }
+    .problem-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
     .problem {
-      margin-bottom: 40px;
+      width: 45%;
+      margin: 10px;
+      text-align: center;
     }
     .rectangle-container {
       position: relative;
@@ -62,7 +69,7 @@
     <button onclick="generateProblems()">문제 시작</button>
   </div>
 
-  <div id="problems"></div>
+  <div id="problems" class="problem-container"></div>
 
   <div id="controls">
     <button onclick="gradeAnswers()">채점하기</button>
@@ -72,7 +79,7 @@
   <div id="endMessage" style="margin-top: 20px; font-weight: bold;"></div>
 
   <script>
-    const numProblems = 5;
+    const numProblems = 10;
     const pixelPerCm = 10;
     let problems = [];
     let incorrectIndexes = [];
